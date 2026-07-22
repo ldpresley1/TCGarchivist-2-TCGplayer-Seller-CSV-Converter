@@ -19,7 +19,7 @@ Prices in generated files are estimates only. They are intended as a close guess
 - Analyzes your input to find which Magic sets you own
 - Fetches prices only for those sets (efficient, respects rate limits)
 - Caches prices for instant re-runs
-- Outputs in exact TCGplayer Seller Portal format (16 columns)
+- Outputs a Seller Portal-compatible 16-column CSV (minimum workflow)
 
 **Example output:**
 ```
@@ -35,10 +35,12 @@ The generated `.tcgplayer.csv` file is **now fully compatible** with TCGplayer S
 
 The converter now outputs one supported schema: `minimum`.
 
-`minimum` uses TCGplayer's 16-column seller import header and reliably fills the required fields for upload:
+`minimum` uses TCGplayer's 16-column seller import header and fills only the key fields needed for this workflow:
 - ✅ `TCG Market Price` (auto-populated from tcgcsv.com)
+- ✅ `TCG Marketplace Price` (same value as `TCG Market Price`)
 - ✅ `Add to Quantity`
 - ✅ `TCGplayer Id`
+- ⚠️ Most other columns are intentionally left blank in this mode (`Product Line`, `Set Name`, `Product Name`, `Title`, `Number`, `Rarity`, `Condition`, `TCG Direct Low`, `TCG Low Price With Shipping`, `TCG Low Price`, `Total Quantity`, `Photo URL`)
 - ⚠️ Pricing values are approximate and should be verified before publishing live inventory
 
 **Safe workflow:**
@@ -46,10 +48,24 @@ The converter now outputs one supported schema: `minimum`.
 2. Import the generated `.tcgplayer.csv` directly into TCGplayer Seller Portal
 3. Done!
 
-## Why this uses Scryfall data
+## TCGplayer Seller ID vs "normal" TCGplayer ID
 
-TCGplayer MTG IDs are available in Scryfall's card data (`tcgplayer_id` and `tcgplayer_etched_id`).
-That gives a stable, scriptable way to keep IDs up to date without managing TCGplayer API credentials.
+This is the most important mapping detail in this repo:
+
+- The input file starts with `Scryfall ID`.
+- Scryfall is used as the first bridge to a TCGplayer product ID (`tcgplayer_id` / `tcgplayer_etched_id`).
+- The converter then tries to resolve the best Seller-usable ID in this order:
+	1. `pricing_custom` export match (preferred when available)
+	2. tcgcsv products index match
+	3. Scryfall-derived TCGplayer ID fallback
+
+So Scryfall is primarily used to translate your original file into TCGplayer space; seller-specific matching is layered on top when data is available.
+
+During conversion, the log prints:
+
+`ID source usage: pricing_custom_export=..., tcgcsv_products=..., scryfall_fallback=...`
+
+This tells you where IDs came from for that run.
 
 ## Requirements
 
