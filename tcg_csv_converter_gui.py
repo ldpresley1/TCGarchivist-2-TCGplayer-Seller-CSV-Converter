@@ -42,7 +42,6 @@ class App(tk.Tk):
         self.single_input_var = tk.StringVar(value="")
         self.single_output_var = tk.StringVar(value="")
         self.single_unmatched_var = tk.StringVar(value="")
-        self.single_profile_var = tk.StringVar(value="minimum")
         self.single_condition_var = tk.StringVar(value="Lightly Played")
         self.single_language_var = tk.StringVar(value="English")
         self.single_skip_var = tk.BooleanVar(value=True)
@@ -51,7 +50,6 @@ class App(tk.Tk):
         self.batch_selected_files_var = tk.StringVar(value="")
         self.batch_output_dir_var = tk.StringVar(value="batch_out")
         self.batch_pattern_var = tk.StringVar(value="*.csv")
-        self.batch_profile_var = tk.StringVar(value="minimum")
         self.batch_condition_var = tk.StringVar(value="Lightly Played")
         self.batch_language_var = tk.StringVar(value="English")
         self.batch_skip_var = tk.BooleanVar(value=True)
@@ -169,14 +167,10 @@ class App(tk.Tk):
             row=2, column=2, sticky="e", padx=4, pady=4
         )
 
-        ttk.Label(parent, text="Profile:").grid(row=3, column=0, sticky="w", padx=4, pady=4)
-        ttk.Combobox(
-            parent,
-            textvariable=self.single_profile_var,
-            values=["minimum", "detailed"],
-            state="readonly",
-            width=16,
-        ).grid(row=3, column=1, sticky="w", padx=4, pady=4)
+        ttk.Label(parent, text="Output Format:").grid(row=3, column=0, sticky="w", padx=4, pady=4)
+        ttk.Label(parent, text="minimum (only supported)").grid(
+            row=3, column=1, sticky="w", padx=4, pady=4
+        )
 
         ttk.Label(parent, text="Condition:").grid(row=4, column=0, sticky="w", padx=4, pady=4)
         ttk.Combobox(
@@ -234,14 +228,10 @@ class App(tk.Tk):
             row=3, column=1, sticky="w", padx=4, pady=4
         )
 
-        ttk.Label(parent, text="Profile:").grid(row=4, column=0, sticky="w", padx=4, pady=4)
-        ttk.Combobox(
-            parent,
-            textvariable=self.batch_profile_var,
-            values=["minimum", "detailed"],
-            state="readonly",
-            width=16,
-        ).grid(row=4, column=1, sticky="w", padx=4, pady=4)
+        ttk.Label(parent, text="Output Format:").grid(row=4, column=0, sticky="w", padx=4, pady=4)
+        ttk.Label(parent, text="minimum (only supported)").grid(
+            row=4, column=1, sticky="w", padx=4, pady=4
+        )
 
         ttk.Label(parent, text="Condition:").grid(row=5, column=0, sticky="w", padx=4, pady=4)
         ttk.Combobox(
@@ -418,7 +408,7 @@ class App(tk.Tk):
                 input_path=input_path,
                 output_path=output_path,
                 unmatched_path=unmatched_path,
-                profile=self.single_profile_var.get().strip() or "detailed",
+                profile="minimum",
                 condition=self.single_condition_var.get().strip() or "Lightly Played",
                 language=self.single_language_var.get().strip() or "English",
                 skip_unmatched=self.single_skip_var.get(),
@@ -480,7 +470,7 @@ class App(tk.Tk):
                     input_files=selected_files,
                     combined_output_path=combined_output,
                     combined_unmatched_path=combined_unmatched,
-                    profile=self.batch_profile_var.get().strip() or "detailed",
+                    profile="minimum",
                     condition=self.batch_condition_var.get().strip() or "Lightly Played",
                     language=self.batch_language_var.get().strip() or "English",
                     skip_unmatched=self.batch_skip_var.get(),
@@ -493,7 +483,7 @@ class App(tk.Tk):
                 input_dir=input_dir,
                 output_dir=output_dir,
                 pattern=self.batch_pattern_var.get().strip() or "*.csv",
-                profile=self.batch_profile_var.get().strip() or "detailed",
+                profile="minimum",
                 condition=self.batch_condition_var.get().strip() or "Lightly Played",
                 language=self.batch_language_var.get().strip() or "English",
                 skip_unmatched=self.batch_skip_var.get(),

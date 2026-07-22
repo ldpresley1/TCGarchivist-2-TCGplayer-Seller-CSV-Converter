@@ -924,133 +924,45 @@ def build_output_row(
     price: Optional[float] = None,
 ) -> dict:
     resolved_price = price if price is not None else DEFAULT_FALLBACK_PRICE
-
-    if profile in {"minimum", "seller_blank_3"}:
-        price_str = f"{resolved_price:.2f}"
-        return {
-            "TCGplayer Id": tcgplayer_id,
-            "Product Line": "",
-            "Set Name": "",
-            "Product Name": "",
-            "Title": "",
-            "Number": "",
-            "Rarity": "",
-            "Condition": "",
-            "TCG Market Price": price_str,
-            "TCG Direct Low": "",
-            "TCG Low Price With Shipping": "",
-            "TCG Low Price": "",
-            "Total Quantity": "",
-            "Add to Quantity": quantity,
-            "TCG Marketplace Price": price_str,
-            "Photo URL": "",
-        }
-
-    if profile in {"minimal", "upload_safe"}:
-        return {
-            "TCGplayer Id": tcgplayer_id,
-            "Add to Quantity": quantity,
-        }
-
-    if profile == "id_qty_price":
-        price_str = f"{resolved_price:.2f}"
-        return {
-            "TCGplayer Id": tcgplayer_id,
-            "Add to Quantity": quantity,
-            "Price": price_str,
-        }
-
-    if profile in {"detailed", "tcgplayer_seller"}:
-        price_str = f"{resolved_price:.2f}"
-        output_number = ""
-        if metadata is not None and metadata.collector_number:
-            output_number = metadata.collector_number
-        else:
-            output_number = normalize_collector_number(source_row.get("Collector number", "") or "")
-        return {
-            "TCGplayer Id": tcgplayer_id,
-            "Product Line": "Magic",
-            "Set Name": metadata.set_name if metadata else "",
-            "Product Name": metadata.name if metadata else source_row.get("Name", ""),
-            "Title": "",
-            "Number": output_number,
-            "Rarity": metadata.rarity if metadata else "",
-            "Condition": condition,
-            "TCG Market Price": price_str,
-            "TCG Direct Low": "",
-            "TCG Low Price With Shipping": "",
-            "TCG Low Price": "",
-            "Total Quantity": "",
-            "Add to Quantity": quantity,
-            "TCG Marketplace Price": price_str,
-            "Photo URL": "",
-        }
-
+    price_str = f"{resolved_price:.2f}"
     return {
         "TCGplayer Id": tcgplayer_id,
-        "Product Name": source_row.get("Name", ""),
-        "Set Code": source_row.get("Set code", ""),
-        "Collector Number": source_row.get("Collector number", ""),
-        "Printing": normalize_finish(source_row.get("Finish", "")).title(),
-        "Condition": condition,
-        "Language": language,
+        "Product Line": "",
+        "Set Name": "",
+        "Product Name": "",
+        "Title": "",
+        "Number": "",
+        "Rarity": "",
+        "Condition": "",
+        "TCG Market Price": price_str,
+        "TCG Direct Low": "",
+        "TCG Low Price With Shipping": "",
+        "TCG Low Price": "",
+        "Total Quantity": "",
         "Add to Quantity": quantity,
+        "TCG Marketplace Price": price_str,
+        "Photo URL": "",
     }
 
 
 def output_headers(profile: str) -> List[str]:
-    if profile in {"minimum", "seller_blank_3"}:
-        return [
-            "TCGplayer Id",
-            "Product Line",
-            "Set Name",
-            "Product Name",
-            "Title",
-            "Number",
-            "Rarity",
-            "Condition",
-            "TCG Market Price",
-            "TCG Direct Low",
-            "TCG Low Price With Shipping",
-            "TCG Low Price",
-            "Total Quantity",
-            "Add to Quantity",
-            "TCG Marketplace Price",
-            "Photo URL",
-        ]
-
-    if profile in {"minimal", "upload_safe"}:
-        return ["TCGplayer Id", "Add to Quantity"]
-    if profile == "id_qty_price":
-        return ["TCGplayer Id", "Add to Quantity", "Price"]
-    if profile in {"detailed", "tcgplayer_seller"}:
-        return [
-            "TCGplayer Id",
-            "Product Line",
-            "Set Name",
-            "Product Name",
-            "Title",
-            "Number",
-            "Rarity",
-            "Condition",
-            "TCG Market Price",
-            "TCG Direct Low",
-            "TCG Low Price With Shipping",
-            "TCG Low Price",
-            "Total Quantity",
-            "Add to Quantity",
-            "TCG Marketplace Price",
-            "Photo URL",
-        ]
     return [
         "TCGplayer Id",
+        "Product Line",
+        "Set Name",
         "Product Name",
-        "Set Code",
-        "Collector Number",
-        "Printing",
+        "Title",
+        "Number",
+        "Rarity",
         "Condition",
-        "Language",
+        "TCG Market Price",
+        "TCG Direct Low",
+        "TCG Low Price With Shipping",
+        "TCG Low Price",
+        "Total Quantity",
         "Add to Quantity",
+        "TCG Marketplace Price",
+        "Photo URL",
     ]
 
 
@@ -1292,19 +1204,7 @@ def dedupe_output_rows(profile: str, rows: List[dict]) -> List[dict]:
     if not rows:
         return rows
 
-    if profile in {"minimal", "upload_safe", "id_qty_price", "minimum", "seller_blank_3"}:
-        key_fields = ["TCGplayer Id"]
-    elif profile in {"detailed", "tcgplayer_seller"}:
-        key_fields = [
-            "TCGplayer Id",
-            "Condition",
-        ]
-    else:
-        key_fields = [
-            "TCGplayer Id",
-            "Condition",
-            "Language",
-        ]
+    key_fields = ["TCGplayer Id"]
 
     grouped: Dict[Tuple[str, ...], dict] = {}
     ordered_keys: List[Tuple[str, ...]] = []
@@ -1408,19 +1308,6 @@ def convert_file(
     print(f"Rows unmatched: {len(unmatched_rows)}")
     if unmatched_path and unmatched_rows:
         print(f"Unmatched report: {unmatched_path}")
-
-    if profile == "tcgplayer_seller":
-        unpriced_cards = [
-            (row.get("Product Name", ""), row.get("Set Name", ""))
-            for row in output_rows
-            if not (row.get("TCG Market Price", "") or "").strip()
-        ]
-        if unpriced_cards:
-            print(f"\nWarning: {len(unpriced_cards)} card(s) without pricing:")
-            for card_name, set_name in unpriced_cards[:10]:
-                print(f"  - {card_name} ({set_name})")
-            if len(unpriced_cards) > 10:
-                print(f"  ... and {len(unpriced_cards) - 10} more")
 
 
 def iter_csv_files(input_dir: pathlib.Path, pattern: str) -> Iterable[pathlib.Path]:
@@ -1568,19 +1455,6 @@ def run_batch(
                 writer.writerows(combined_unmatched_rows)
             print(f"Combined unmatched report: {combined_unmatched_path}")
 
-        if profile == "tcgplayer_seller":
-            unpriced_cards = [
-                (row.get("Product Name", ""), row.get("Set Name", ""))
-                for row in combined_rows
-                if not (row.get("TCG Market Price", "") or "").strip()
-            ]
-            if unpriced_cards:
-                print(f"\nWarning: {len(unpriced_cards)} card(s) without pricing:")
-                for card_name, set_name in unpriced_cards[:10]:
-                    print(f"  - {card_name} ({set_name})")
-                if len(unpriced_cards) > 10:
-                    print(f"  ... and {len(unpriced_cards) - 10} more")
-
     print(f"Batch complete. Files converted: {converted}/{len(files)}")
 
 
@@ -1685,19 +1559,6 @@ def run_combine_files(
             writer.writerows(combined_unmatched_rows)
         print(f"Combined unmatched report: {combined_unmatched_path}")
 
-    if profile == "tcgplayer_seller":
-        unpriced_cards = [
-            (row.get("Product Name", ""), row.get("Set Name", ""))
-            for row in combined_rows
-            if not (row.get("TCG Market Price", "") or "").strip()
-        ]
-        if unpriced_cards:
-            print(f"\nWarning: {len(unpriced_cards)} card(s) without pricing:")
-            for card_name, set_name in unpriced_cards[:10]:
-                print(f"  - {card_name} ({set_name})")
-            if len(unpriced_cards) > 10:
-                print(f"  ... and {len(unpriced_cards) - 10} more")
-
 
 def parse_args(argv: List[str]) -> argparse.Namespace:
     parser = argparse.ArgumentParser(
@@ -1722,12 +1583,6 @@ def parse_args(argv: List[str]) -> argparse.Namespace:
         default="",
         help="Optional unmatched row report CSV path.",
     )
-    convert.add_argument(
-        "--profile",
-        choices=["minimum", "detailed"],
-        default="minimum",
-        help="Output schema profile.",
-    )
     convert.add_argument("--condition", default="Lightly Played", help="Default card condition for output.")
     convert.add_argument("--language", default="English", help="Default card language for output.")
     convert.add_argument(
@@ -1750,12 +1605,6 @@ def parse_args(argv: List[str]) -> argparse.Namespace:
         help="Optional unmatched row report path for combined output mode.",
     )
     batch.add_argument("--pattern", default="*.csv", help="Glob pattern for source files.")
-    batch.add_argument(
-        "--profile",
-        choices=["minimum", "detailed"],
-        default="minimum",
-        help="Output schema profile.",
-    )
     batch.add_argument("--condition", default="Lightly Played", help="Default card condition for output.")
     batch.add_argument("--language", default="English", help="Default card language for output.")
     batch.add_argument(
@@ -1781,12 +1630,6 @@ def parse_args(argv: List[str]) -> argparse.Namespace:
         "--unmatched-output",
         default="",
         help="Optional unmatched row report CSV path for combined mode.",
-    )
-    combine.add_argument(
-        "--profile",
-        choices=["minimum", "detailed"],
-        default="minimum",
-        help="Output schema profile.",
     )
     combine.add_argument("--condition", default="Lightly Played", help="Default card condition for output.")
     combine.add_argument("--language", default="English", help="Default card language for output.")
@@ -1822,7 +1665,7 @@ def main(argv: List[str]) -> int:
                 input_path=pathlib.Path(args.input),
                 output_path=pathlib.Path(args.output),
                 unmatched_path=unmatched,
-                profile=args.profile,
+                profile="minimum",
                 condition=args.condition,
                 language=args.language,
                 skip_unmatched=args.skip_unmatched,
@@ -1842,7 +1685,7 @@ def main(argv: List[str]) -> int:
                 input_dir=pathlib.Path(args.input_dir),
                 output_dir=output_dir,
                 pattern=args.pattern,
-                profile=args.profile,
+                profile="minimum",
                 condition=args.condition,
                 language=args.language,
                 skip_unmatched=args.skip_unmatched,
@@ -1859,7 +1702,7 @@ def main(argv: List[str]) -> int:
                 input_files=[pathlib.Path(p) for p in args.inputs],
                 combined_output_path=pathlib.Path(args.output),
                 combined_unmatched_path=unmatched,
-                profile=args.profile,
+                profile="minimum",
                 condition=args.condition,
                 language=args.language,
                 skip_unmatched=args.skip_unmatched,

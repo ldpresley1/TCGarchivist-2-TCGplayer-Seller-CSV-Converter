@@ -3,7 +3,7 @@
 This app does four things:
 
 1. Builds and updates a local MTG TCGplayer ID database.
-2. Converts your collection CSV format into a TCGplayer-ID-mapped CSV with **automatic pricing**.
+2. Converts your collection CSV format into a minimum-format TCGplayer Seller CSV with **automatic pricing**.
 3. Populates **TCG Market Price** from live tcgcsv.com pricing data.
 4. Batch-converts many CSV files at once.
 
@@ -29,14 +29,16 @@ TCGplayer Id,Product Line,Set Name,Product Name,Title,Number,Rarity,Condition,TC
 
 See [PRICING_IMPLEMENTATION.md](PRICING_IMPLEMENTATION.md) for full details.
 
-## Important: TCGplayer Format
+## Important: Output Format
 
 The generated `.tcgplayer.csv` file is **now fully compatible** with TCGplayer Seller Portal import.
 
-The 16-column format matches exactly what TCGplayer exports and imports, including:
+The converter now outputs one supported schema: `minimum`.
+
+`minimum` uses TCGplayer's 16-column seller import header and reliably fills the required fields for upload:
 - ✅ `TCG Market Price` (auto-populated from tcgcsv.com)
-- ✅ `Condition` (all cards set to "Lightly Played")
-- ✅ All required columns for import
+- ✅ `Add to Quantity`
+- ✅ `TCGplayer Id`
 - ⚠️ Pricing values are approximate and should be verified before publishing live inventory
 
 **Safe workflow:**
@@ -97,27 +99,9 @@ Convert your current file:
 python tcg_csv_converter.py convert --input "Entire_Collection_Export_2026-06-21.csv" --output "Entire_Collection_Export_2026-06-21.tcgplayer.csv" --unmatched-output "Entire_Collection_Export_2026-06-21.unmatched.csv" --skip-unmatched
 ```
 
-## Output profiles
+## Output format
 
-- `detailed` (default):
-  - `TCGplayer Id`
-  - `Product Name`
-  - `Set Code`
-  - `Collector Number`
-  - `Printing`
-  - `Condition`
-  - `Language`
-  - `Add to Quantity`
-
-- `minimal`:
-  - `TCGplayer Id`
-  - `Add to Quantity`
-
-Example with minimal profile:
-
-```powershell
-python tcg_csv_converter.py convert --input "input.csv" --output "output.csv" --profile minimal --skip-unmatched
-```
+Only the `minimum` output format is supported.
 
 ## Batch conversion
 
@@ -142,13 +126,13 @@ python tcg_csv_converter.py batch --input-dir "." --combined-output "combined.tc
 Or choose exact files (multi-file picker equivalent for CLI):
 
 ```powershell
-python tcg_csv_converter.py combine --inputs "file1.csv" "file2.csv" --output "combined.tcgplayer.csv" --unmatched-output "combined.unmatched.csv" --profile tcgplayer_seller --skip-unmatched
+python tcg_csv_converter.py combine --inputs "file1.csv" "file2.csv" --output "combined.tcgplayer.csv" --unmatched-output "combined.unmatched.csv" --skip-unmatched
 ```
 
 You can also deduplicate in explicit combine mode:
 
 ```powershell
-python tcg_csv_converter.py combine --inputs "file1.csv" "file2.csv" --output "combined.tcgplayer.csv" --unmatched-output "combined.unmatched.csv" --profile tcgplayer_seller --skip-unmatched --dedupe
+python tcg_csv_converter.py combine --inputs "file1.csv" "file2.csv" --output "combined.tcgplayer.csv" --unmatched-output "combined.unmatched.csv" --skip-unmatched --dedupe
 ```
 
 Each source file writes:
@@ -158,7 +142,7 @@ Each source file writes:
 
 When `--combined-output` is used, one merged file is written instead of per-file outputs.
 
-In `tcgplayer_seller` profile, both `TCG Market Price` and `TCG Marketplace Price` are now populated with the fetched market price.
+Both `TCG Market Price` and `TCG Marketplace Price` are populated with the fetched market price.
 
 ## Keep IDs updated
 
