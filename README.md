@@ -24,7 +24,7 @@ Prices in generated files are estimates only. They are intended as a close guess
 **Example output:**
 ```
 TCGplayer Id,Product Line,Set Name,Product Name,Title,Number,Rarity,Condition,TCG Market Price,...
-35630,Magic,Magic 2011,Wurm's Tooth,,222,uncommon,Lightly Played,0.42,...
+35630,,,,,,,,0.42,,,,,3,0.42,
 ```
 
 See [PRICING_IMPLEMENTATION.md](PRICING_IMPLEMENTATION.md) for full details.
