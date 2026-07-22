@@ -4,6 +4,10 @@
 
 The TCG CSV converter now automatically fetches real TCGplayer market prices from the tcgcsv.com API and populates the **TCG Market Price** column in the 16-column tcgplayer_seller format.
 
+## Pricing Disclaimer
+
+Fetched prices are approximate estimates and may lag behind live market changes. Treat them as a close starting point, then verify and adjust prices in TCGplayer before publishing inventory.
+
 ## How It Works
 
 ### Smart Set-Based Price Fetching

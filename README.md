@@ -11,6 +11,10 @@ This app does four things:
 
 The converter now automatically fetches real TCGplayer market prices and populates the **TCG Market Price** column.
 
+## Pricing Disclaimer
+
+Prices in generated files are estimates only. They are intended as a close guess for faster listing workflows, not as guaranteed accurate or real-time values. Always review and adjust pricing in TCGplayer before final upload.
+
 **How it works:**
 - Analyzes your input to find which Magic sets you own
 - Fetches prices only for those sets (efficient, respects rate limits)
@@ -33,6 +37,7 @@ The 16-column format matches exactly what TCGplayer exports and imports, includi
 - ✅ `TCG Market Price` (auto-populated from tcgcsv.com)
 - ✅ `Condition` (all cards set to "Lightly Played")
 - ✅ All required columns for import
+- ⚠️ Pricing values are approximate and should be verified before publishing live inventory
 
 **Safe workflow:**
 1. Run this converter on your collection export
