@@ -1,0 +1,32 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+
+# Virtual environments / local envs
+.venv/
+venv/
+.conda/
+
+# Build artifacts
+build/
+dist/
+
+# Local editor/OS artifacts
+*.lnk
+
+# Generated app output
+batch_out/
+*.tcgplayer.csv
+*.unmatched.csv
+
+# Local input/output data exports (often personal and large)
+*.csv
+
+# Local runtime/cache data
+data/gui_settings.json
+data/tcgplayer_groups_cache.json
+data/tcgplayer_groups.json
+data/tcgplayer_mtg_index.json
+data/tcgplayer_price_cache.json
+data/tcgplayer_prices.json
